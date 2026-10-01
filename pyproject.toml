@@ -1,0 +1,24 @@
+[project]
+name = "faster-fusion"
+dynamic = ["version"]
+description = "Calibration and 3-D reconstruction of mirror-swept ultrasound: B-mode, colour flow with SIVV flow rate, shear-wave elastography"
+requires-python = ">=3.10"
+dependencies = ["PySide6>=6.6", "pyqtgraph>=0.13.7", "pyvista>=0.44", "pyvistaqt>=0.11", "vtk>=9.3",
+                "numpy>=1.26", "scipy>=1.11", "pydicom>=3.0", "Pillow>=10", "imageio>=2.34",
+                "imageio-ffmpeg>=0.5"]
+
+[project.gui-scripts]
+faster-fusion = "faster_fusion.__main__:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "faster_fusion.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["faster_fusion*"]
+
+[tool.setuptools.package-data]
+faster_fusion = ["resources/*"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
