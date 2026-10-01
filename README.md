@@ -1,17 +1,71 @@
-# FASTER Fusion (app)
+# FASTER Fusion
 
-A standalone app for calibrating and reconstructing mirror-swept ultrasound in 3-D:
-B-mode cines, colour flow with the SIVV volumetric flow rate, and shear-wave elastography.
-It's the MATLAB **FASTER_Fusion** ported to Python, with the same modes, layouts and
-numbers, and it doesn't need MATLAB or Python to run.
+**Turn a mirror-swept 2-D ultrasound probe into a 3-D scanner.** FASTER Fusion calibrates the
+sweep, reconstructs the captured frames into a volume, and shows it in 3-D: B-mode, colour
+flow (with the volumetric flow rate, SIVV) and shear-wave elastography (SWE). No MATLAB or
+Python needed to run it.
 
-| rail | does what the MATLAB GUI did |
+<p align="center">
+  <img src="docs/img/colorflow_3d_turn.gif" width="31%" alt="Colour-flow volume rotating in 3-D">
+  <img src="docs/img/swe_3d_turn.gif" width="31%" alt="Shear-wave elastography volume rotating in 3-D">
+  <img src="docs/img/bmode_3d_turn.gif" width="31%" alt="B-mode volume rotating in 3-D">
+</p>
+<p align="center"><sub>Colour flow &nbsp;·&nbsp; SWE &nbsp;·&nbsp; B-mode, all reconstructed from phantom scans. Every volume can be dragged, rotated and saved as an MP4.</sub></p>
+
+## Download
+
+| | |
 |---|---|
-| **Calibration → Stepped** | `Calibration_CF`: index tabs on a stepped position set (for Color Flow, SWE) |
-| **Calibration → Cine** | `Calibration_GUI_v1`: index tabs on a continuous cine (for B-Mode) |
-| **B-Mode** | `Recon_v1`: Siemens DICOM cine or Verasonics IQ |
-| **Color Flow** | `Recon_CF_v2`: velocity/speed volume and SIVV flow rate |
-| **SWE** | `Recon_SWE`: velocity/quality volume |
+| **Windows 10/11** | [**FASTER-Fusion-1.2.2-Setup.exe**](https://github.com/dongliang-yan/FASTER-Fusion/releases/latest): the installer; it adds a Start Menu entry and an optional Desktop shortcut.<br>Or the portable [`-Windows.zip`](https://github.com/dongliang-yan/FASTER-Fusion/releases/latest): unzip anywhere and run `FASTER Fusion.exe`. |
+| **macOS (Apple silicon)** | [**FASTER-Fusion-1.2.2-macOS.dmg**](https://github.com/dongliang-yan/FASTER-Fusion/releases/latest): open it and drag **FASTER Fusion** to Applications. |
+
+All downloads are on the **[Releases page](https://github.com/dongliang-yan/FASTER-Fusion/releases/latest)**.
+
+- *Windows:* if SmartScreen says "Windows protected your PC", choose **More info → Run anyway**. The app isn't code-signed.
+- *macOS:* the first time, **right-click → Open → Open**, for the same reason.
+
+## How it works
+
+The probe's image plane is swept by a rotating mirror, so each captured frame is a slice at a
+different angle. Two steps turn those slices into a volume:
+
+1. **Calibrate.** Scan a fixture with index tabs and click the tabs. The app fits the sweep
+   angle of every frame and saves it as a `.mat` calibration (compatible with the MATLAB GUIs).
+2. **Reconstruct.** Load a scan plus its calibration, check the 2-D result, and press
+   **display3D**.
+
+<p align="center"><img src="docs/img/calibration.png" width="85%" alt="Calibration page: index tabs shown on the position map"></p>
+<p align="center"><sub><b>1. Calibration.</b> The position map shows the index tabs as bright tracks; click them to fit the angle of every position.</sub></p>
+
+### Scan through the positions, then see the volume
+
+<p align="center"><img src="docs/img/swe_positions.gif" width="85%" alt="Stepping through captured positions in SWE mode"></p>
+<p align="center"><sub><b>SWE.</b> Step through the captured positions (top left), watch the 2-D reconstruction update (bottom), then render the 3-D volume (right).</sub></p>
+
+### Colour flow and flow rate
+
+<p align="center"><img src="docs/img/colorflow.png" width="85%" alt="Colour flow page with the SIVV flow rate"></p>
+<p align="center"><sub><b>Colour flow + SIVV.</b> Velocity or speed volume over B-mode, with the volumetric flow rate: here 148.1 mL/min at 69 mm depth.</sub></p>
+
+### B-mode
+
+<p align="center"><img src="docs/img/bmode.png" width="85%" alt="B-mode page: pick a sweep block and render it"></p>
+<p align="center"><sub><b>B-mode.</b> Click a sweep block on the cine map, check the 2-D frame, then render it. Reads Siemens DICOM and Verasonics IQ.</sub></p>
+
+<p align="center"><img src="docs/img/swe.png" width="85%" alt="SWE page with the 3-D shear-wave volume"></p>
+
+| mode | what it does | matches the MATLAB |
+|---|---|---|
+| **Calibration → Stepped** | index tabs on a stepped position set (for Color Flow, SWE) | `Calibration_CF` |
+| **Calibration → Cine** | index tabs on a continuous cine (for B-Mode) | `Calibration_GUI_v1` |
+| **B-Mode** | Siemens DICOM cine or Verasonics IQ | `Recon_v1` |
+| **Color Flow** | velocity/speed volume and SIVV flow rate | `Recon_CF_v2` |
+| **SWE** | velocity/quality volume | `Recon_SWE` |
+
+It's the MATLAB **FASTER_Fusion** ported to Python, with the same modes, layouts and numbers
+(the agreement is tabulated under *Validation against MATLAB* below).
+
+---
 
 ## Install and run
 
@@ -112,3 +166,13 @@ dmg and zip to each run.
 **Signing:** to get rid of the "unidentified developer" step on macOS, the app needs signing
 and notarizing with an Apple Developer ID. On Windows, a code-signing certificate avoids the
 SmartScreen prompt. Neither is needed to use the app.
+
+**Publishing a release:** push a version tag and GitHub builds both apps and attaches them to a
+Release page (the macOS `.dmg`, the Windows `Setup.exe` and the Windows `.zip`):
+
+```bash
+git tag v1.2.2 && git push origin v1.2.2
+```
+
+The screenshots and GIFs in `docs/img` are regenerated from the real app by
+`docs/make_media.py` (it needs a desktop session and the `Data` folder).

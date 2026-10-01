@@ -1,8 +1,18 @@
 # Builds the macOS and Windows apps on GitHub's machines and attaches them to
 # the run. The core tests need the Data folder, which is not in the repository,
 # so here they are skipped and only the build and the imports are checked.
+#
+# To publish a download page (Releases) for a version, push a tag:
+#   git tag v1.2.2 && git push origin v1.2.2
+# The release gets the macOS .dmg, the Windows installer and the Windows .zip.
 name: build
-on: [push, workflow_dispatch]
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   build:
     strategy:
@@ -16,6 +26,8 @@ jobs:
         with: {python-version: "3.12"}
       - run: python -m pip install -r requirements.txt
       - run: python -m pytest -q
+        env:
+          QT_QPA_PLATFORM: offscreen
       - name: Build (macOS)
         if: runner.os == 'macOS'
         run: |
@@ -33,3 +45,20 @@ jobs:
             dist/*.dmg
             dist/*.zip
             dist/*-Setup.exe
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: assets/*
+          generate_release_notes: true
+          body: |
+            ## Download
+            - **Windows:** `FASTER-Fusion-*-Setup.exe` (installer with Start Menu and Desktop shortcuts), or the portable `-Windows.zip`
+            - **macOS (Apple silicon):** `FASTER-Fusion-*-macOS.dmg`, drag to Applications, then right-click → Open the first time (the app is not code-signed)
