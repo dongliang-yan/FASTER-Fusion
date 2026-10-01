@@ -91,15 +91,26 @@ class Spin(QtWidgets.QDoubleSpinBox):
         fm = self.fontMetrics()
         vals = [self.value(), max(min(self.maximum(), 999), -99), max(self.minimum(), -99)]
         w = max(fm.horizontalAdvance(self.prefix() + self.textFromValue(v) + self.suffix()) for v in vals)
-        return w + fm.horizontalAdvance("0")
+        return w + 2 * fm.horizontalAdvance("0")
+
+    def _chrome_width(self) -> int:
+        """Frame, text margins and the up/down buttons as this platform's style
+        draws them (side by side on Windows 11, so wider than on macOS)."""
+        opt = QtWidgets.QStyleOptionSpinBox()
+        self.initStyleOption(opt)
+        opt.rect = QtCore.QRect(0, 0, 400, 30)
+        st = self.style()
+        edit = st.subControlRect(QtWidgets.QStyle.CC_SpinBox, opt,
+                                 QtWidgets.QStyle.SC_SpinBoxEditField, self)
+        return max(30, 400 - edit.width()) + 10
 
     def sizeHint(self):
         h = super().sizeHint()
-        return QtCore.QSize(self._text_width() + 30, h.height())
+        return QtCore.QSize(self._text_width() + self._chrome_width(), h.height())
 
     def minimumSizeHint(self):
         h = super().minimumSizeHint()
-        return QtCore.QSize(self._text_width() + 26, h.height())
+        return QtCore.QSize(self._text_width() + self._chrome_width(), h.height())
 
     def _changed(self, v):
         if not self._silent:
