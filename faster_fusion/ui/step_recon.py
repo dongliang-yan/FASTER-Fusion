@@ -354,7 +354,7 @@ class StepReconPage(QtWidgets.QWidget):
         self.sl_rot.setMinimumWidth(90)
         self.sl_rot.valueChanged.connect(self._rotate)
         self.lb_ang = QtWidgets.QLabel("0 deg"); self.lb_ang.setMinimumWidth(56)
-        self.bt_reset = QtWidgets.QPushButton("Reset view"); self.bt_reset.clicked.connect(lambda: self.sl_rot.setValue(0))
+        self.bt_reset = QtWidgets.QPushButton("Reset view"); self.bt_reset.clicked.connect(self.reset_view)
         self.bt_mp4 = QtWidgets.QPushButton("Save MP4"); self.bt_mp4.clicked.connect(self.save_video)
         self.bt_mp4.setToolTip("Write a full turn of the volume as an MP4, captured from this renderer")
         bot.addWidget(label("Range", rtip)); bot.addWidget(self.sp_lo); bot.addWidget(self.sp_hi)
@@ -1232,6 +1232,17 @@ class StepReconPage(QtWidgets.QWidget):
         if self.view.active:
             self.view.clear(msg)
         self.shown = ""
+
+    def reset_view(self):
+        """Reset view: the camera itself, not just the slider. After the volume
+        has been turned or zoomed with the mouse the slider is usually still at
+        0, and setting it to 0 again changed nothing."""
+        self.sl_rot.blockSignals(True)
+        self.sl_rot.setValue(0)
+        self.sl_rot.blockSignals(False)
+        self.lb_ang.setText("0 deg")
+        if self.view.active:
+            self.view.reset()
 
     def _rotate(self, a):
         self.lb_ang.setText(f"{a} deg")

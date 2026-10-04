@@ -632,6 +632,16 @@ class Volume3D(QtWidgets.QWidget):
             self._fit()
             self.set_angle(self.angle)
 
+    def reset(self):
+        """Back to the fitted view, face on - whatever the mouse has done to the
+        camera since: turned, tilted, panned or zoomed."""
+        if self.plotter is None:
+            return
+        # a scroll zoom narrows the field of view rather than moving the camera
+        self.plotter.camera.view_angle = 30.0
+        self._fit()
+        self.set_angle(0.0)
+
     def set_angle(self, a: float):
         """Turn about the depth axis; 0 deg looks along the lateral axis, so the
         sector is face on."""

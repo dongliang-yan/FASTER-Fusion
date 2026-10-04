@@ -3,7 +3,7 @@
 % MATLAB with the package folders on disk (Recon_v1, Calibration_v1, Recon_SWE,
 % ColorFlow and Data beside FASTER_Fusion_App). Paths are set at the top.
 
-R   = '/Users/yandongliang/Desktop/Recon_Siemens_GUI_package';
+R   = fileparts(fileparts(fileparts(mfilename('fullpath'))));   % the folder holding FASTER_Fusion_App
 OUT = fullfile(R,'FASTER_Fusion_App','tests','ref');   % where the references go
 addpath(fullfile(R,'Recon_v1')); addpath(fullfile(R,'Calibration_v1'));
 addpath(fullfile(R,'Recon_SWE')); addpath(fullfile(R,'ColorFlow'));
